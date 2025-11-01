@@ -24,9 +24,9 @@ import AdminUsers from './admin/pages/AdminUsers.jsx';
 import AdminAnalytics from './admin/pages/AdminAnalytics.jsx';
 import AdminSettings from './admin/pages/AdminSettings.jsx';
 
-import {BrowserRouter,Routes,Route} from 'react-router-dom'
+import {BrowserRouter,Routes,Route, Navigate} from 'react-router-dom'
 import { CartProvider } from './components/CartContext.jsx';
-import { AuthProvider } from './components/AuthContext.jsx';
+import { AuthProvider, useAuth } from './components/AuthContext.jsx';
 
 const Placeholder = ({ title }) => (
   <div className="menu-container" style={{ padding: 40, textAlign: 'center' }}>
@@ -46,8 +46,8 @@ function App() {
 
       <Route path="/" element={<Home />} ></Route>
             <Route path="/menu" element={<Menu />} ></Route>
-            <Route path="/cart" element={<Cart />} ></Route>
-            <Route path="/checkout" element={<Checkout />} ></Route>
+            <Route path="/cart" element={<RequireAuth><Cart /></RequireAuth>} ></Route>
+            <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} ></Route>
             <Route path="/order-success" element={<OrderSuccess />} ></Route>
             <Route path="/orders" element={<OrderHistory />} ></Route>
             <Route path="/orders/:id" element={<OrderDetails />} ></Route>
@@ -75,3 +75,11 @@ function App() {
 }
 
 export default App
+
+function RequireAuth({ children }) {
+  const { token } = useAuth();
+  if (!token) {
+    return <Navigate to="/signin" replace />;
+  }
+  return children;
+}
